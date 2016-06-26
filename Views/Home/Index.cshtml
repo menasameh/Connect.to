@@ -1,0 +1,249 @@
+﻿@model IEnumerable<Model.post>
+
+@{
+    ViewBag.Title = "Home Page";
+}
+
+@if (Session["email"] != null)
+{
+<div class="jumbotron">
+    <h2>Search</h2>
+    <ul class="nav nav-tabs">
+        <li class="active"><a data-toggle="tab" href="#mail">By Full-Email</a></li>
+        <li><a data-toggle="tab" href="#first_last">By Name</a></li>
+        <li><a data-toggle="tab" href="#phone">By Phone</a></li>
+        <li><a data-toggle="tab" href="#home">By Home Town</a></li>
+        <li><a data-toggle="tab" href="#caption">By Part of Caption</a></li>
+    </ul>
+
+    <div class="tab-content">
+        <div id="mail" class="tab-pane fade in active">
+            <h3>Search by Full-Mail</h3>
+            <form action="/Home/SearchGeneral" class="form-horizontal" method="post">
+                <input name="type" type="hidden" value="1">
+                <div class="form-group">
+                    <label class="control-label col-md-2">Full Email:</label>
+                    <div class="col-md-8">
+                        <input type="text" class="form-control text-box single-line" name="text">
+                    </div>
+                    <div class="col-md-2">
+                        <input type="submit" value="Search" class="btn btn-default" />
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div id="first_last" class="tab-pane fade in">
+            <h3>Search by Name</h3>
+            <form action="/Home/SearchName" class="form-horizontal" method="post">
+                <div class="form-group">
+                    <label class="control-label col-md-2">First Name:</label>
+                    <div class="col-md-10">
+                        <input type="text" class="form-control text-box single-line" name="first">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-md-2">Last Name:</label>
+                    <div class="col-md-8">
+                        <input type="text" class="form-control text-box single-line" name="last">
+                    </div>
+                    <div class="col-md-2">
+                        <input type="submit" value="Search" class="btn btn-default" />
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div id="phone" class="tab-pane fade in">
+            <h3>Search by Phone Number</h3>
+            <form action="/Home/SearchGeneral" class="form-horizontal" method="post">
+                <input name="type" type="hidden" value="2">
+                <div class="form-group">
+                    <label class="control-label col-md-2">Phone:</label>
+                    <div class="col-md-8">
+                        <input type="text" class="form-control text-box single-line" name="text">
+                    </div>
+                    <div class="col-md-2">
+                        <input type="submit" value="Search" class="btn btn-default" />
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div id="home" class="tab-pane fade in">
+            <h3>Search by Home Town</h3>
+            <form action="/Home/SearchGeneral" class="form-horizontal" method="post">
+                <input name="type" type="hidden" value="3">
+                <div class="form-group">
+                    <label class="control-label col-md-2">Home Town:</label>
+                    <div class="col-md-8">
+                        <input type="text" class="form-control text-box single-line" name="text">
+                    </div>
+                    <div class="col-md-2">
+                        <input type="submit" value="Search" class="btn btn-default" />
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div id="caption" class="tab-pane fade in">
+            <h3>Search by Caption</h3>
+            <form action="/Home/SearchGeneral" class="form-horizontal" method="post">
+                <input name="type" type="hidden" value="4">
+                <div class="form-group">
+                    <label class="control-label col-md-2">Caption:</label>
+                    <div class="col-md-8">
+                        <input type="text" class="form-control text-box single-line" name="text">
+                    </div>
+                    <div class="col-md-2">
+                        <input type="submit" value="Search" class="btn btn-default" />
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+   
+    @foreach (var p in Model.AsEnumerable())
+    {
+        String publicPost = p.IsPublic ? "Public" : "Private";
+        <div class="row">
+            <div class="col-sm-3 col-md-3"></div>
+            <div class="col-sm-6 col-md-6 card">
+                <div class="container">
+                    <div class="row">
+                        <img src="~/Content/images/@p.PosterImagePath" class="img-rounded col-xs-2 col-md-2" />
+                        <div class="container col-md-10">
+                            <div class="row">
+                                @Html.ActionLink(@p.PosterName, "Profile", "User", new { mail = @p.PosterMail }, null)
+                            </div>
+                            <div class="row">
+                                @publicPost - @p.PostingDate
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-1 col-md-1"></div>
+                        <div class="comment col-md-10" style="font-size:25px;">
+                            @p.Caption
+                        </div>
+                    </div>
+                    @if (p.ImagePath != "1-default-male.png")
+                    {
+                        <div class="row">
+                            <div class="col-md-2 col-xs-2"></div>
+                            <img src="~/Content/images/@p.ImagePath" class="img-rounded col-xs-8 col-md-8" />
+                            <div class="col-md-2 col-xs-2"></div>
+                        </div>
+                    }
+                    <div class="row">
+                        @if (!ViewBag.likes.Contains(p.id))
+                        {
+                            <p><a data-id="@p.id" class="btn btn-primary btn-lg likeButton pull-left col-md-2">like</a></p>
+                        }
+                        <p><a href="#likesList" data-id="@p.id" data-toggle="modal" class="btn btn-primary like btn-lg pull-right col-sm-2 col-md-2">likes</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+        <!-- Button trigger modal -->
+        <!-- Modal -->
+    <div class="modal fade" id="likesList" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                    <h4 class="modal-title">Likes</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="list-group">
+                    </div>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+    
+}
+else
+{
+    <div class="container col-md-12">
+        <div class="row col-md-12">
+            <h1>Connect.to</h1>
+        </div>
+        <div class="row">
+            <img src="~/Content/images/pic.jpg" class="row img-responsive col-md-12" alt="Chania" />
+        </div>
+    </div>
+
+
+}
+
+<script>
+    $(document).ready(
+        function () {
+            $(".likeButton").click(function (event) {
+                var oThis = $(this);
+                $.ajax({
+                    url: '/User/Like',
+                    type: 'POST',
+                    data: { postId: $(this).data("id") },
+                    success: function (data) {
+                        if (data.result == "success") {
+                            oThis.closest("p").hide();
+                        }
+                    },
+                    error: function (xhr, textStatus, errorThrown) {
+                        alert('request failed');
+                    }
+                });
+            });
+
+            $(".like").click(function (event) {
+                var likesList = $("#likesList").find("div.list-group");
+                $.ajax({
+                    url: '/User/Likes',
+                    type: 'POST',
+                    data: { postId: $(this).data("id") },
+                    success: function (data) {
+                        if (data.result == "success") {
+                            likesList.empty();
+                            data.likes
+                            for (var i = 0; i < data.likes.length ; ++i) {
+                                var element = "<div class=\"list-group-item\">"+
+                                            "<img src=\"/Content/images/" + data.likes[i].PicturePath + "\" class=\"img-rounded\" width=\"20\" height=\"20\">" +
+                                            "<a href=\"/User/Profile?mail=" + data.likes[i].Email + "\">  " + data.likes[i].FirstName + " " + data.likes[i].LastName + "</a>" +
+                                            "</div>";
+                                likesList.append(element);
+                            }
+                        }
+                    },
+                    error: function (xhr, textStatus, errorThrown) {
+                        likesList.empty();
+                        alert('request failed');
+                    }
+                });
+            });
+            $(".comment").emoticonize();
+        });
+</script>
+
+
+
+<style>
+    div.card {
+        box-shadow: 0px 2px 8px 0 rgba(0, 0, 0, 0.2);
+        padding: 10px 0;
+        margin: 10px 1px;
+    }
+
+    div.row {
+        margin-right: -15px;
+        margin-left: -15px;
+        margin-bottom: 10px;
+    }
+
+    textarea {
+        max-width: 100%;
+    }
+</style>

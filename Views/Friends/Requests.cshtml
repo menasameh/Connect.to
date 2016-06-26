@@ -1,0 +1,80 @@
+﻿@model IEnumerable<Model.user>
+
+@{
+    ViewBag.Title = "Requests list";
+}
+
+<h2>Requests list</h2>
+
+<div class="container">
+    <div class="list-group">
+        @foreach (var item in Model)
+        {
+            <div class="col-sm-6 col-md-6 card list-group-item col-md-offset-3 col-sm-offset-3">
+                <img src="~/Content/images/@item.PicturePath" class="img-circle col-xs-6 col-md-4" />
+                <div class="container col-md-6">
+                    <div class="row">
+                        @Html.ActionLink(item.FirstName + " " + item.LastName, "Profile", "User", new { mail = item.Email }, null)
+                    </div>
+                    <div class="row">
+                        @item.Email
+                    </div>
+                    <div class="row">
+                        <div class="btn-group">
+                            <button data-mail="@item.Email" type="button" class="accept btn btn-success">Accept</button>
+                            <button data-mail="@item.Email" type="button" class="reject btn btn-danger">Reject</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+        </div>
+    </div>
+
+<script>
+    $(document).ready(
+        function () {
+            $(".accept").click(function () {
+                //var formData = new FormData
+                var $k = $(this);
+                $.post(
+                    "/Friends/AcceptRequest",
+                    { mail: this.dataset["mail"] },
+                    function (data) {
+                        if (data.result == "success") {
+                            var $card = $k.closest("div.card").hide();
+                            if(data.requests == 0){
+                                $("#requests").hide();
+                            } else {
+                                $("#requests").html(data.requests);
+                            }
+                        }
+                    }, 'json');
+            });
+
+            $(".reject").click(function () {
+                var $k = $(this);
+                $.post(
+                    "/Friends/RejectRequest",
+                    { mail: this.dataset["mail"] },
+                    function (data) {
+                        if (data.result == "success") {
+                            var $card = $k.closest("div.card").hide();
+                            if (data.requests == 0) {
+                                $("#requests").hide();
+                            } else {
+                                $("#requests").html(data.requests);
+                            }
+                        }
+                    }, 'json');
+            });
+        });
+</script>
+
+<style>
+    div.card {
+        box-shadow: 0px 2px 8px 0 rgba(0, 0, 0, 0.2);
+        margin-top:10px;
+        margin-bottom:10px;
+    }
+</style>

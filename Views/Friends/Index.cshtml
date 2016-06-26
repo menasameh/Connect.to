@@ -1,0 +1,39 @@
+﻿@model IEnumerable<Model.user>
+
+@{
+    ViewBag.Title = "Friends list";
+}
+
+<h2>Friends list</h2>
+
+<div class="container">
+    <div class="row">
+        @{int y = 0;}
+        @foreach (var item in Model)
+        {
+            int size = (y++ % 2 == 0) ? 1 : 2;
+            <div class="col-sm-@size col-md-@size"></div>
+            <div class="col-sm-4 col-md-4 card">
+                <img src="~/Content/images/@item.PicturePath" class="img-circle col-xs-6 col-md-4" />
+                <div class="container col-md-6">
+                    <div class="row">
+                        @Html.ActionLink(item.FirstName + " " + item.LastName, "Profile", "User", new { mail = item.Email }, null)
+                    </div>
+                    <div class="row">
+                        @item.Email
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+
+
+<style>
+    div.card {
+        box-shadow: 0px 2px 8px 0 rgba(0, 0, 0, 0.2);
+        padding: 10px 0;
+        margin: 10px 1px;
+    }
+</style>

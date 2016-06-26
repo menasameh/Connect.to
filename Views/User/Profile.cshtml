@@ -1,0 +1,252 @@
+﻿@model Model.user
+
+@if (@ViewBag.founded)
+{
+    ViewBag.Title = "Profile";
+
+    <h2>Profile</h2>
+
+    <div class="jumbotron container">
+
+        <div class="row">
+
+            <img src="~/Content/images/@Model.PicturePath" class="img-circle col-xs-2 col-md-2" />
+
+            <div class="container col-md-6">
+                <div class="row">
+                    @Html.DisplayFor(model => model.FirstName) @Html.DisplayFor(model => model.LastName)
+                </div>
+                <div class="row">
+                    @Html.DisplayFor(model => model.Email) @Html.DisplayFor(model => model.PhoneNumber)
+                </div>
+                <div class="row">
+                    @Html.DisplayFor(model => model.Gender) @Html.DisplayFor(model => model.MaritalStatus)
+                </div>
+                <div class="row">
+                    @Html.DisplayFor(model => model.HomeTown)
+                </div>
+                <div class="row">
+                    @Html.DisplayFor(model => model.BirthDate)
+                </div>
+            </div>
+        </div>
+        @if (@ViewBag.friend || @ViewBag.owner)
+        {
+            <div class="row col-md-12">
+                <h3>
+                    About me
+                </h3>
+                @Html.DisplayFor(model => model.Aboutme)
+            </div>
+        }
+        @if (!@ViewBag.owner && !@ViewBag.friend)
+        {
+            if (@ViewBag.friendRequestSent)
+            {
+                <p><a class="btn btn-default btn-lg disabled pull-right">friend request sent</a></p>
+            }
+            else
+            {
+                <p><a id="add_friend" class="btn btn-primary btn-lg pull-right">add friend</a></p>
+            }
+        }
+    </div>
+
+    
+   
+    
+
+    <div class="container">
+        <form action="/FileUpload/post" enctype="multipart/form-data" method="post">
+            <div class="row">
+                <div class="col-sm-3 col-md-3"></div>
+                <div class="col-sm-6 col-md-6 card">
+                    <div class="container">
+                        <div class="row">
+                            
+                            <div class="col-md-10">
+                                <h2>New Post</h2>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-1 col-md-1"></div>
+                        <div class="form-group col-md-10">
+                            <label for="comment">Comment:</label>
+                            <textarea id="comment" class="form-control" rows="5" name="p.Caption"></textarea>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-1 col-md-1"></div>
+                        <div class="col-md-10">
+                            <div class="form-group container col-md-6">
+                                <div class="row">
+                                    <label></label>
+                                </div>
+                                <div class="row">
+                                    <label for="photo">Upload a Photo:</label>
+                                </div>
+                                <div class="row">
+                                    <label class="btn btn-default btn-file">
+                                        Browse <input id="browse" type="file" style="display: none;" accept="image/x-png, image/gif, image/jpeg" name="file">
+                                    </label>
+                                </div>
+                            </div>                        
+                        </div>
+                    </div>
+                        <div class="row">
+                            <div class="col-sm-1 col-md-1"></div>
+                            <div class="col-md-10">
+                                <label><input type="checkbox" name="p.IsPublic" value="true">Public post?</label>
+                                <input class="btn btn-default" type="submit" value="Post" />
+                            </div>
+                        </div>
+                </div>
+            </div>
+        </form>
+
+    @foreach (var p in Model.posts)
+    {
+        String publicPost = p.IsPublic ? "Public" : "Private";
+        <div class="row">
+            <div class="col-sm-3 col-md-3"></div>
+            <div class="col-sm-6 col-md-6 card">
+                <div class="container">
+                    <div class="row">
+                        <img src="~/Content/images/@p.PosterImagePath" class="img-rounded col-xs-2 col-md-2" />
+                        <div class="container col-md-10">
+                            <div class="row">
+                                @Html.ActionLink(@p.PosterName, "Profile", "User", new { mail = @p.PosterMail }, null)
+                            </div>
+                            <div class="row">
+                                @publicPost - @p.PostingDate
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-1 col-md-1"></div>
+                        <div class="comment col-md-10" style="font-size:25px;">
+                            @p.Caption
+                        </div>
+                    </div>
+                    @if (p.ImagePath != "1-default-male.png")
+                    {
+                    <div class="row">
+                        <div class="col-md-2 col-xs-2"></div>
+                        <img src="~/Content/images/@p.ImagePath" class="img-rounded col-xs-8 col-md-8" />
+                        <div class="col-md-2 col-xs-2"></div>
+                    </div>
+                    }
+                    <div class="row">
+                        @if (!Model.likes.Contains(p.id))
+                        {
+                            <p><a data-id="@p.id" class="btn btn-primary btn-lg likeButton pull-left col-md-2">like</a></p>
+                        }
+                        <p><a href="#likesList" data-id="@p.id" data-toggle="modal" class="btn btn-primary like btn-lg pull-right col-sm-2 col-md-2">likes</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    </div>
+
+
+        <!-- Button trigger modal -->
+        <!-- Modal -->
+    <div class="modal fade" id="likesList" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                    <h4 class="modal-title">Likes</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="list-group">
+                    </div>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+
+}
+else
+{
+    <h2>User Not found</h2>
+}
+
+
+<script>
+    $(document).ready(
+        function () {
+            $("#add_friend").click(function () {
+                $.post(
+                    "/Friends/addFriend",
+                    { mail: "@Html.DisplayFor(model => model.Email)" },
+                    function (data) {
+                        window.location = data.url;
+                    }, 'json');
+            });
+
+            $(".likeButton").click(function (event) {
+                var oThis = $(this);
+                $.ajax({
+                    url: '/User/Like',
+                    type: 'POST',
+                    data: { postId: $(this).data("id") },
+                    success: function (data) {
+                        if (data.result == "success") {
+                            oThis.closest("p").hide();
+                        }
+                    },
+                    error: function (xhr, textStatus, errorThrown) {
+                        alert('request failed');
+                    }
+                });
+            });
+
+            $(".like").click(function (event) {
+                var likesList = $("#likesList").find("div.list-group");
+                $.ajax({
+                    url: '/User/Likes',
+                    type: 'POST',
+                    data: { postId: $(this).data("id") },
+                    success: function (data) {
+                        if (data.result == "success") {
+                            likesList.empty();
+                            data.likes
+                            for (var i = 0; i < data.likes.length ; ++i) {
+                                var element = "<div class=\"list-group-item\">"+
+                                            "<img src=\"/Content/images/" + data.likes[i].PicturePath + "\" class=\"img-rounded\" width=\"20\" height=\"20\">" +
+                                            "<a href=\"/User/Profile?mail=" + data.likes[i].Email + "\">  " + data.likes[i].FirstName + " " + data.likes[i].LastName + "</a>" +
+                                            "</div>";
+                                likesList.append(element);
+                            }
+                        }
+                    },
+                    error: function (xhr, textStatus, errorThrown) {
+                        likesList.empty();
+                        alert('request failed');
+                    }
+                });
+            });
+            $(".comment").emoticonize();
+        });
+</script>
+
+
+<style>
+    div.card {
+        box-shadow: 0px 2px 8px 0 rgba(0, 0, 0, 0.2);
+        padding: 10px 0;
+        margin: 10px 1px;
+    }
+
+    div.row {
+        margin-right: -15px;
+        margin-left: -15px;
+        margin-bottom: 10px;
+    }
+    textarea {
+  max-width: 100%;
+}
+</style>

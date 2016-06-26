@@ -1,0 +1,189 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title - Connect.to</title>
+    @Styles.Render("~/Content/css")
+
+
+    @Scripts.Render("~/bundles/modernizr")
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+
+    <script src="~/Scripts/notify.min.js"></script>
+   
+
+   
+
+
+    <script src="~/Scripts/jquery.cssemoticons.js"></script>
+    <link href="~/Content/jquery.cssemoticons.css" rel="stylesheet" />
+</head>
+<body>
+    <div class="navbar navbar-inverse navbar-fixed-top">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                @Html.ActionLink("Connect.to", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
+            </div>
+            <div class="navbar-collapse collapse">
+                @{
+                    if (Session["email"] != null)
+                    {
+                        <ul class="nav navbar-right navbar-nav">
+                            <li>
+                                <a href="@Url.Action("Profile", "User", new { mail = @Session["email"] })">
+                                    <img src="~/Content/images/@Session["ppsrc"]" class="img-rounded" width="20" height="20" />
+                                    <span>@Session["email"]</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="@Url.Action("Index", "Friends")">
+                                    <span>Friends</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="@Url.Action("Requests", "Friends")">
+                                    <span>Requests
+                                    @{
+                                        String hidden = "";
+                                        if ((int)Session["requests"] == 0)
+                                        {
+                                            hidden = "hidden";
+                                        }
+                                    }
+                                    
+                                        <span id="requests" class="label label-pill label-danger @hidden">@Session["requests"]</span>
+                                    </span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="@Url.Action("EditProfile", "User")">
+                                    <span>Edit Profile</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="" id="logout">
+                                    <span>Log out</span>
+                                </a>
+                            </li>
+                        </ul>
+
+                    }
+                    else
+                    {
+                        <ul class="nav navbar-right navbar-nav">
+                            <li>@Html.ActionLink("Login", "Login", "User")</li>
+                            <li>@Html.ActionLink("Sign up", "Register", "User")</li>
+                        </ul>
+//Html.ActionLink("Login", "Login", "User", new { area = "" }, new { @class = "navbar-right navbar-brand" });
+                    }
+                }
+                
+            </div>
+        </div>
+    </div>
+    <div class="container body-content">
+        @RenderBody()
+        <hr />
+        <footer>
+            <p>&copy; @DateTime.Now.Year - Connect.to</p>
+        </footer>
+    </div>
+
+
+</body>
+</html>
+
+
+    <script>
+        $(document).ready(
+            function () {
+                $("#logout").click(function () {
+                    $.ajax({
+                        type: "POST",
+                        url: "/User/Logout",
+                        success: function (data) {
+                            window.location = data.url;
+                        }
+                    });
+                });
+                
+            });
+</script>
+
+
+
+    
+    <script src="~/Scripts/jquery.signalR-2.2.0.min.js"></script>
+    <script src="~/signalr/hubs"></script>
+    <script>
+    $(function () {
+        if ("@Session["email"]" != "") {
+            var hub = $.connection.notificationsHub;
+            // Create a function that the hub can call back to display messages.
+            hub.client.warrning = function () {
+                //alert("done");
+            };
+            hub.client.likeNotifaication = function (name, mail) {
+                if (mail == "@Session["email"]") {
+                    $.notify(name + " has liked a post of you", { position: "left bottom", className: "success" });
+                }
+            };
+
+            hub.client.friendRequestNotification = function (name, mail) {
+                if (mail == "@Session["email"]") {
+                    $.ajax({
+                        type: "POST",
+                        url: "/User/calcRequests",
+                        success: function (data) {
+                            if (data.result == "success") {
+                                if (data.count == 0) {
+                                    $("#requests").hide();
+                                }
+                                else {
+                                    $("#requests").show();
+                                    $("#requests").removeClass("hidden");
+
+                                    $("#requests").html(data.count);
+                                }
+                            }
+                        }
+                    });
+                    $.notify(name + " wants to be your friend", { position: "left bottom", className: "success" });
+                }
+            };
+
+            hub.client.friendRequestAcceptedNotification = function (name, mail) {
+                if (mail == "@Session["email"]") {
+                    $.notify(name + " accepted your friend request", { position: "left bottom", className: "success" });
+
+                }
+            };
+
+            hub.client.friendRequestRejectedNotification = function (name, mail) {
+                if (mail == "@Session["email"]") {
+                    $.notify(name + " rejected your friend request", { position: "left bottom", className: "warn" });
+                }
+            };
+
+
+            $.connection.hub.start().done(function () {
+                //alert("connected");
+                //$('#sendmessage').click(function () {
+                //    // Call the Send method on the hub.
+                //    chat.server.send($('#displayname').val(), $('#message').val());
+                //});
+                //chat.server.hello();
+            });
+
+        }
+    });
+    </script>
+
+@RenderSection("scripts", required: false)

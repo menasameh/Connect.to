@@ -1,0 +1,218 @@
+﻿@model Model.user
+
+@{
+    ViewBag.Title = "EditProfile";
+}
+
+<h2>EditProfile</h2>
+
+<ul class="nav nav-tabs">
+    <li class="active"><a data-toggle="tab" href="#pp">Profile Picture</a></li>
+    <li><a data-toggle="tab" href="#password">Password</a></li>
+    <li><a data-toggle="tab" href="#details">Details</a></li>
+</ul>
+
+<div class="tab-content">
+    <div id="pp" class="tab-pane fade in active">
+        <form id="imageUploader" action="/FileUpload/upload" enctype="multipart/form-data" method="post">
+            <div class="container">
+                <div class="row">
+                    <div class="container col-md-6">
+                        <div class="row">
+                            <label></label>
+                        </div>
+                        <div class="row">
+                            <label for="photo">Upload a Photo:</label>
+                        </div>
+                        <div class="row">
+                            <label class="btn btn-default btn-file">
+                                Browse <input id="browse" type="file" style="display: none;" accept="image/x-png, image/gif, image/jpeg" name="file">
+                            </label>
+                            <input class="btn btn-default disabled" id="submitter" type="submit" value="Change Profile picture" />
+                        </div>
+                    </div>
+                    <div class="container col-md-6">
+                        <div class="row">
+                            <label></label>
+                        </div>
+                        <div class="row">
+                            <label></label>
+                        </div>
+                        <div class="row">
+                            <input id="resetpp" type="submit" class="btn btn-danger col-md-4" value="set profile picture to default " />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div id="password" class="tab-pane fade in">
+        <h3>Change Password</h3>
+        <form action="/User/ChangePassword" class="form-horizontal" method="post">
+            <div class="form-group">
+                <label class="control-label col-md-2">Old password:</label>
+                <div class="col-md-10">
+                    <input type="password" class="form-control text-box single-line" name="oldPass">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label col-md-2">New Password:</label>
+                <div class="col-md-8">
+                    <input type="password" class="form-control text-box single-line" name="newPass">
+                </div>
+                <div class="col-md-2">
+                    <input type="submit" value="Update Password" class="btn btn-default" />
+                </div>
+            </div>
+        </form>
+    </div>
+    <div id="details" class="tab-pane fade in">
+        @using (Html.BeginForm())
+        {
+            @Html.AntiForgeryToken()
+
+            <div class="form-horizontal">
+                <hr />
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.FirstName, htmlAttributes: new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        <input type="text" class="form-control text-box single-line" name="u.FirstName" value="@Model.FirstName">
+                        @Html.ValidationMessageFor(model => model.FirstName, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.LastName, htmlAttributes: new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        <input type="text" class="form-control text-box single-line" name="u.LastName" value="@Model.LastName">
+                        @Html.ValidationMessageFor(model => model.LastName, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.Email, htmlAttributes: new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        <input type="text" class="form-control text-box single-line" name="u.Email" value="@Model.Email">
+                        <span class="field-validation-valid text-danger" data-valmsg-for="Email" data-valmsg-replace="true">@ViewBag.msg</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.PhoneNumber, htmlAttributes: new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        <input type="text" class="form-control text-box single-line" name="u.PhoneNumber" value="@Model.PhoneNumber">
+                        @Html.ValidationMessageFor(model => model.PhoneNumber, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.HomeTown, htmlAttributes: new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        <input type="text" class="form-control text-box single-line" name="u.HomeTown" value="@Model.HomeTown">
+                        @Html.ValidationMessageFor(model => model.HomeTown, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.MaritalStatus, htmlAttributes: new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @{
+            String s = (Model.MaritalStatus == "Single") ? "checked" : "";
+            String e = (Model.MaritalStatus == "Engaged") ? "checked" : "";
+            String m = (Model.MaritalStatus == "Married") ? "checked" : "";
+                        }
+                        <div class="radio-inline">
+                            <label><input type="radio" name="u.MaritalStatus" @s value="Single">Single</label>
+                        </div>
+                        <div class="radio-inline">
+                            <label><input type="radio" name="u.MaritalStatus" @e value="Engaged">Engaged</label>
+                        </div>
+                        <div class="radio-inline">
+                            <label><input type="radio" name="u.MaritalStatus" @m value="Married">Married</label>
+                        </div>
+                         @Html.ValidationMessageFor(model => model.MaritalStatus, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.Aboutme, htmlAttributes: new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        <textarea class="form-control" rows="5" name="u.Aboutme">@Model.Aboutme</textarea>
+                        @Html.ValidationMessageFor(model => model.Aboutme, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-md-offset-2 col-md-10">
+                        <input type="submit" value="Save" class="btn btn-default" />
+                    </div>
+                </div>
+            </div>
+        }
+
+    </div>
+    
+</div>
+
+
+
+
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}
+
+<script>
+
+    function validate() {
+
+    }
+
+    $("#browse").change(function () {
+        $("#submitter").removeClass("disabled");
+    });
+
+    //$("#j").submit(function (evt) {
+    //  evt.preventDefault();
+
+      
+
+    //  var formData = new FormData($(this)[0]); 
+
+    //  $.ajax({
+    //      url: '/FileUpload/upload',
+    //      type: 'POST',
+    //      data: formData,
+    //      async: false,
+    //      cache: false,
+    //      contentType: false,
+    //      enctype: 'multipart/form-data',
+    //      processData: false,
+    //      success: function (response) {
+    //          alert(response);
+    //      }
+    //  });
+
+    //  return false;
+    //});
+
+    $("#resetpp").click(
+        function(){
+            $.ajax({
+                url: '/User/Resetpp',
+                type: 'POST',
+                success: function (data) {
+                    if (data.result == "Redirect") {
+                        window.location = data.url;
+                    }
+                    //alert(response);
+                }
+            });
+    });
+
+    </script>
+
+
